@@ -2,35 +2,55 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
-import DropDown, { VibeType } from "../components/DropDown";
 import Footer from "../components/Footer";
-import Github from "../components/GitHub";
 import Header from "../components/Header";
 import LoadingDots from "../components/LoadingDots";
 import ResizablePanel from "../components/ResizablePanel";
+import ChipSelect, { AlcoholInventory } from "../components/ChipSelect";
+import InventorySelect from "../components/InventorySelect";
+
+interface RecipeResponse {
+  name: string;
+  ingredients: { name: string; amount: string }[];
+  instructions: string;
+}
 
 const Home: NextPage = () => {
   const [loading, setLoading] = useState(false);
-  const [bio, setBio] = useState("");
-  const [vibe, setVibe] = useState<VibeType>("Professional");
-  const [generatedBios, setGeneratedBios] = useState<String>("");
 
-  console.log("Streamed response: ", generatedBios);
+  // const [alcohol, setAlcohol] = useState<AlcoholInventory>("Vodka");
+  const [generatedRecipes, setGeneratedRecipes] = useState<
+    RecipeResponse | undefined
+  >();
 
-  const prompt =
-    vibe === "Funny"
-      ? `Generate 2 funny twitter bios with no hashtags and clearly labeled "1." and "2.". Make sure there is a joke in there and it's a little ridiculous. Make sure each generated bio is at max 20 words and base it on this context: ${bio}${
-          bio.slice(-1) === "." ? "" : "."
-        }`
-      : `Generate 2 ${vibe} twitter bios with no hashtags and clearly labeled "1." and "2.". Make sure each generated bio is at least 14 words and at max 20 words and base them on this context: ${bio}${
-          bio.slice(-1) === "." ? "" : "."
-        }`;
+  const [readableRecipes, setReadableRecipes] = useState<string>("");
 
-  const generateBio = async (e: any) => {
+  const [alcoholInventory, setAlcoholInventory] = useState<string[]>([]);
+  const [mixerInventory, setMixerInventory] = useState<string[]>([]);
+  // useEffect(() => {
+  //   console.log(data);
+  // }, [data]);
+
+  function handleAlcoholInventory(inventory: string[]) {
+    setAlcoholInventory(inventory);
+    console.log(alcoholInventory);
+  }
+  function handleMixerInventory(inventory: string[]) {
+    setMixerInventory(inventory);
+    console.log(mixerInventory);
+  }
+
+  // console.log("Streamed response: ", generatedBios);
+
+  // Need a array to collect ingridents
+
+  const prompt = `Generate one cocktail recipe with only the following ingredients: ${alcoholInventory}. The ingredients should also contain amounts. Format it into a json file. The key for the name of the recipe should be "name". The key for the ingredients should be "ingredients". The key for the instructions should be "instructions". The keys within "ingredients" should be "name" and "amount".`;
+
+  const generateRecipes = async (e: any) => {
     e.preventDefault();
-    setGeneratedBios("");
+    setGeneratedRecipes(undefined);
     setLoading(true);
     const response = await fetch("/api/generate", {
       method: "POST",
@@ -41,9 +61,25 @@ const Home: NextPage = () => {
         prompt,
       }),
     });
+
+    // const generateRecipes = async (e: any) => {
+    //   e.preventDefault();
+    //   setGeneratedRecipes("");
+    //   setLoading(true);
+    //   const response = await fetch("/api/generate", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       prompt,
+    //     }),
+    //   });
+
     console.log("Edge function returned.");
 
     if (!response.ok) {
+      console.log(response);
       throw new Error(response.statusText);
     }
 
@@ -57,40 +93,60 @@ const Home: NextPage = () => {
     const decoder = new TextDecoder();
     let done = false;
 
+    let chunks = "";
     while (!done) {
       const { value, done: doneReading } = await reader.read();
       done = doneReading;
       const chunkValue = decoder.decode(value);
-      setGeneratedBios((prev) => prev + chunkValue);
+      // setReadableRecipes((prev) => prev + chunkValue);
+      chunks += chunkValue;
     }
+    setGeneratedRecipes(JSON.parse(chunks));
+    console.log(chunks);
+    console.log(generatedRecipes);
 
     setLoading(false);
   };
+  let alcoholArray = [
+    "Vodka",
+    "Rum",
+    "Tequila",
+    "Baileys Irish Cream",
+    "Whiskey",
+    "Amaretto",
+    "Peach Schnapps",
+    "Sake",
+    "Triple Sec",
+  ];
+  let mixerArray = [
+    "Orange Juice",
+    "Sprite",
+    "Coke",
+    "Pineapple Juice",
+    "Milk",
+    "Lime Juice",
+    "Cream",
+    "Coffee",
+  ];
 
   return (
     <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
       <Head>
-        <title>Twitter Generator</title>
+        <title>AI Bartender</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <Header />
       <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-12 sm:mt-20">
-        <a
-          className="flex max-w-fit items-center justify-center space-x-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600 shadow-md transition-colors hover:bg-gray-100 mb-5"
-          href="https://github.com/Nutlope/twitterbio"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Github />
-          <p>Star on GitHub</p>
-        </a>
         <h1 className="sm:text-6xl text-4xl max-w-2xl font-bold text-slate-900">
-          Generate your next Twitter bio in seconds
+          Try some new cocktail recipes!
         </h1>
-        <p className="text-slate-500 mt-5">18,167 bios generated so far.</p>
+        <p className="text-slate-400 text-2xl mt-2">
+          Impress your friends by making something other than a Vodka Sprite
+        </p>
+
         <div className="max-w-xl w-full">
-          <div className="flex mt-10 items-center space-x-3">
+          <div className="flex mt-10 mb-5 items-center space-x-3">
             <Image
               src="/1-black.png"
               width={30}
@@ -98,37 +154,31 @@ const Home: NextPage = () => {
               alt="1 icon"
               className="mb-5 sm:mb-0"
             />
-            <p className="text-left font-medium">
-              Copy your current bio{" "}
-              <span className="text-slate-500">
-                (or write a few sentences about yourself)
-              </span>
-              .
-            </p>
+            <p className="text-left font-medium">What alcohol do you have?</p>
           </div>
-          <textarea
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            rows={4}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5"
-            placeholder={
-              "e.g. Senior Developer Advocate @vercel. Tweeting about web development, AI, and React / Next.js. Writing nutlope.substack.com."
-            }
+          <InventorySelect
+            handleInventory={handleAlcoholInventory}
+            inventory={alcoholArray}
           />
-          <div className="flex mb-5 items-center space-x-3">
+
+          <div className="flex mt-10 mb-5 items-center space-x-3">
             <Image src="/2-black.png" width={30} height={30} alt="1 icon" />
-            <p className="text-left font-medium">Select your vibe.</p>
+            <p className="text-left font-medium">What mixers do you have?</p>
           </div>
-          <div className="block">
-            <DropDown vibe={vibe} setVibe={(newVibe) => setVibe(newVibe)} />
-          </div>
+
+          <InventorySelect
+            handleInventory={handleMixerInventory}
+            inventory={mixerArray}
+          />
+
+          {/* <ChipSelect/> */}
 
           {!loading && (
             <button
               className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
-              onClick={(e) => generateBio(e)}
+              onClick={(e) => generateRecipes(e)}
             >
-              Generate your bio &rarr;
+              Let's Get Mixing! &rarr;
             </button>
           )}
           {loading && (
@@ -149,33 +199,76 @@ const Home: NextPage = () => {
         <ResizablePanel>
           <AnimatePresence mode="wait">
             <motion.div className="space-y-10 my-10">
-              {generatedBios && (
+              {generatedRecipes && (
                 <>
                   <div>
                     <h2 className="sm:text-4xl text-3xl font-bold text-slate-900 mx-auto">
-                      Your generated bios
+                      Your generated recipes
                     </h2>
                   </div>
                   <div className="space-y-8 flex flex-col items-center justify-center max-w-xl mx-auto">
-                    {generatedBios
-                      .substring(generatedBios.indexOf("1") + 3)
+                    {/* {generatedRecipes
+                      .substring(generatedRecipes.indexOf("1") + 3)
                       .split("2.")
-                      .map((generatedBio) => {
+                      .map((generatedRecipes) => {
                         return (
                           <div
                             className="bg-white rounded-xl shadow-md p-4 hover:bg-gray-100 transition cursor-copy border"
                             onClick={() => {
-                              navigator.clipboard.writeText(generatedBio);
-                              toast("Bio copied to clipboard", {
+                              navigator.clipboard.writeText(generatedRecipes);
+                              toast("Recipe copied to clipboard", {
                                 icon: "✂️",
                               });
                             }}
-                            key={generatedBio}
+                            key={generatedRecipes}
                           >
-                            <p>{generatedBio}</p>
+                            <p>{generatedRecipes}</p>
                           </div>
                         );
-                      })}
+                      })} */}
+                    {
+                      <div
+                        className="bg-white rounded-xl shadow-md p-4 hover:bg-gray-100 transition cursor-copy border"
+                        onClick={() => {
+                          navigator.clipboard.writeText(
+                            `${
+                              generatedRecipes.name
+                            } ingredients: ${generatedRecipes.ingredients.map(
+                              (ingredient) => {
+                                return (
+                                  " " +
+                                  ingredient.name +
+                                  ": " +
+                                  ingredient.amount
+                                );
+                              }
+                            )} instructions: ${generatedRecipes.instructions}`
+                            // JSON.stringify(generatedRecipes)
+                          );
+                          toast("Recipe copied to clipboard", {
+                            icon: "✂️",
+                          });
+                        }}
+                      >
+                        <h1 className="text-xl font-bold">
+                          {generatedRecipes.name}
+                        </h1>
+                        <h3 className="font-bold">Ingredients</h3>
+                        <ul>
+                          {generatedRecipes.ingredients.map(
+                            (ingredient, index) => {
+                              return (
+                                <li key={index}>
+                                  {ingredient.name} {ingredient.amount}
+                                </li>
+                              );
+                            }
+                          )}
+                        </ul>
+                        <h3 className="font-bold">Instructions</h3>
+                        <p>{generatedRecipes.instructions}</p>
+                      </div>
+                    }
                   </div>
                 </>
               )}
