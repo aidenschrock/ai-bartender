@@ -1,19 +1,19 @@
 import { useState } from "react";
 
-let alcohol: String[] = [
-  "Vodka",
-  "Tequila",
-  "Rum",
-  "Non-alcoholic",
-  "Milk",
-  "Orange Juice",
-  "Pineapple Juice",
-  "Sprite",
-];
+// let alcohol: String[] = [
+//   "Vodka",
+//   "Tequila",
+//   "Rum",
+//   "Non-alcoholic",
+//   "Milk",
+//   "Orange Juice",
+//   "Pineapple Juice",
+//   "Sprite",
+// ];
 
 let promptIngredients: string[] = [];
 
-export default function InventorySelect({ handleInventory, inventory }) {
+export default function InventorySelect(handleInventory: any, inventory: any) {
   const userSelect = (e: any) => {
     let containBoolean = e.target.classList.contains("activeChip");
     if (containBoolean) {
@@ -30,7 +30,7 @@ export default function InventorySelect({ handleInventory, inventory }) {
 
   return (
     <div className="flex flex-row flex-wrap py-3 gap-x-2">
-      {inventory.map((inventoryItem, index) => (
+      {inventory.map((inventoryItem: any, index: any) => (
         <div
           key={index}
           onClick={(e) => userSelect(e)}

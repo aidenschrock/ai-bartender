@@ -27,7 +27,7 @@ let alcohol: AlcoholInventory[] = [
 
 let promptIngredients: string[] = [];
 
-export default function ChipSelect({ handleInventory }) {
+export default function ChipSelect(handleInventory: any) {
   const userSelect = (e: any) => {
     let containBoolean = e.target.classList.contains("activeChip");
     if (containBoolean) {

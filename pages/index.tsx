@@ -29,9 +29,6 @@ const Home: NextPage = () => {
 
   const [alcoholInventory, setAlcoholInventory] = useState<string[]>([]);
   const [mixerInventory, setMixerInventory] = useState<string[]>([]);
-  // useEffect(() => {
-  //   console.log(data);
-  // }, [data]);
 
   function handleAlcoholInventory(inventory: string[]) {
     setAlcoholInventory(inventory);
@@ -44,9 +41,7 @@ const Home: NextPage = () => {
 
   // console.log("Streamed response: ", generatedBios);
 
-  // Need a array to collect ingridents
-
-  const prompt = `Generate one cocktail recipe with only the following ingredients: ${alcoholInventory}. The ingredients should also contain amounts. Format it into a json file. The key for the name of the recipe should be "name". The key for the ingredients should be "ingredients". The key for the instructions should be "instructions". The keys within "ingredients" should be "name" and "amount".`;
+  const prompt = `Generate one cocktail recipe with only the following ingredients: ${alcoholInventory} ${mixerInventory}. The ingredients should also contain amounts. Format it into a json file. The key for the name of the recipe should be "name". The key for the ingredients should be "ingredients". The key for the instructions should be "instructions". The keys within "ingredients" should be "name" and "amount".`;
 
   const generateRecipes = async (e: any) => {
     e.preventDefault();
