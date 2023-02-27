@@ -13,10 +13,14 @@ import { useState } from "react";
 
 let promptIngredients: string[] = [];
 
-export default function InventorySelect(
-  handleInventory: any,
-  inventory: string[]
-) {
+interface InventorySelectProps {
+  handleInventory: any;
+  inventory: string[];
+}
+
+export default function InventorySelect(props: InventorySelectProps) {
+  const { handleInventory, inventory } = props;
+
   const userSelect = (e: any) => {
     let containBoolean = e.target.classList.contains("activeChip");
     if (containBoolean) {

@@ -81,7 +81,7 @@ const Home: NextPage = () => {
 
     setLoading(false);
   };
-  let alcoholArray = [
+  const alcoholArray = [
     "Vodka",
     "Rum",
     "Tequila",
@@ -92,7 +92,8 @@ const Home: NextPage = () => {
     "Sake",
     "Triple Sec",
   ];
-  let mixerArray = [
+
+  const mixerArray = [
     "Orange Juice",
     "Sprite",
     "Coke",
