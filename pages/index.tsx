@@ -2,13 +2,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import LoadingDots from "../components/LoadingDots";
 import ResizablePanel from "../components/ResizablePanel";
-import ChipSelect, { AlcoholInventory } from "../components/ChipSelect";
 import InventorySelect from "../components/InventorySelect";
 
 interface RecipeResponse {
@@ -20,12 +19,8 @@ interface RecipeResponse {
 const Home: NextPage = () => {
   const [loading, setLoading] = useState(false);
 
-  // const [alcohol, setAlcohol] = useState<AlcoholInventory>("Vodka");
-  const [generatedRecipes, setGeneratedRecipes] = useState<
-    RecipeResponse | undefined
-  >();
-
-  const [readableRecipes, setReadableRecipes] = useState<string>("");
+  const [generatedRecipes, setGeneratedRecipes] =
+    useState<RecipeResponse | null>();
 
   const [alcoholInventory, setAlcoholInventory] = useState<string[]>([]);
   const [mixerInventory, setMixerInventory] = useState<string[]>([]);
@@ -39,13 +34,11 @@ const Home: NextPage = () => {
     console.log(mixerInventory);
   }
 
-  // console.log("Streamed response: ", generatedBios);
-
   const prompt = `Generate one cocktail recipe with only the following ingredients: ${alcoholInventory} ${mixerInventory}. The ingredients should also contain amounts. Format it into a json file. The key for the name of the recipe should be "name". The key for the ingredients should be "ingredients". The key for the instructions should be "instructions". The keys within "ingredients" should be "name" and "amount".`;
 
   const generateRecipes = async (e: any) => {
     e.preventDefault();
-    setGeneratedRecipes(undefined);
+    setGeneratedRecipes(null);
     setLoading(true);
     const response = await fetch("/api/generate", {
       method: "POST",
@@ -56,20 +49,6 @@ const Home: NextPage = () => {
         prompt,
       }),
     });
-
-    // const generateRecipes = async (e: any) => {
-    //   e.preventDefault();
-    //   setGeneratedRecipes("");
-    //   setLoading(true);
-    //   const response = await fetch("/api/generate", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({
-    //       prompt,
-    //     }),
-    //   });
 
     console.log("Edge function returned.");
 
@@ -166,8 +145,6 @@ const Home: NextPage = () => {
             inventory={mixerArray}
           />
 
-          {/* <ChipSelect/> */}
-
           {!loading && (
             <button
               className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
@@ -202,25 +179,6 @@ const Home: NextPage = () => {
                     </h2>
                   </div>
                   <div className="space-y-8 flex flex-col items-center justify-center max-w-xl mx-auto">
-                    {/* {generatedRecipes
-                      .substring(generatedRecipes.indexOf("1") + 3)
-                      .split("2.")
-                      .map((generatedRecipes) => {
-                        return (
-                          <div
-                            className="bg-white rounded-xl shadow-md p-4 hover:bg-gray-100 transition cursor-copy border"
-                            onClick={() => {
-                              navigator.clipboard.writeText(generatedRecipes);
-                              toast("Recipe copied to clipboard", {
-                                icon: "✂️",
-                              });
-                            }}
-                            key={generatedRecipes}
-                          >
-                            <p>{generatedRecipes}</p>
-                          </div>
-                        );
-                      })} */}
                     {
                       <div
                         className="bg-white rounded-xl shadow-md p-4 hover:bg-gray-100 transition cursor-copy border"
@@ -238,7 +196,6 @@ const Home: NextPage = () => {
                                 );
                               }
                             )} instructions: ${generatedRecipes.instructions}`
-                            // JSON.stringify(generatedRecipes)
                           );
                           toast("Recipe copied to clipboard", {
                             icon: "✂️",

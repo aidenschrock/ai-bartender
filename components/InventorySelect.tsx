@@ -13,7 +13,10 @@ import { useState } from "react";
 
 let promptIngredients: string[] = [];
 
-export default function InventorySelect(handleInventory: any, inventory: any) {
+export default function InventorySelect(
+  handleInventory: any,
+  inventory: string[]
+) {
   const userSelect = (e: any) => {
     let containBoolean = e.target.classList.contains("activeChip");
     if (containBoolean) {
@@ -30,15 +33,16 @@ export default function InventorySelect(handleInventory: any, inventory: any) {
 
   return (
     <div className="flex flex-row flex-wrap py-3 gap-x-2">
-      {inventory.map((inventoryItem: any, index: any) => (
-        <div
-          key={index}
-          onClick={(e) => userSelect(e)}
-          className="transition-all hover:border-blue-500 hover:cursor-pointer rounded-full mt-1 py-2 px-6 w-max border border-gray-300"
-        >
-          {inventoryItem}
-        </div>
-      ))}
+      {inventory &&
+        inventory.map((inventoryItem: string, index: number) => (
+          <div
+            key={index}
+            onClick={(e) => userSelect(e)}
+            className="transition-all hover:border-blue-500 hover:cursor-pointer rounded-full mt-1 py-2 px-6 w-max border border-gray-300"
+          >
+            {inventoryItem}
+          </div>
+        ))}
     </div>
   );
 }
