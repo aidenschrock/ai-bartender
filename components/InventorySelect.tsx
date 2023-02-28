@@ -1,16 +1,3 @@
-import { useState } from "react";
-
-// let alcohol: String[] = [
-//   "Vodka",
-//   "Tequila",
-//   "Rum",
-//   "Non-alcoholic",
-//   "Milk",
-//   "Orange Juice",
-//   "Pineapple Juice",
-//   "Sprite",
-// ];
-
 let promptIngredients: string[] = [];
 
 interface InventorySelectProps {
